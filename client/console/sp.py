@@ -11,6 +11,10 @@ def createParser ():
     subparsers = parser.add_subparsers (dest='command')
 
     subparsers.add_parser ('version')
+
+    server_parser = subparsers.add_parser ('server')
+    server_parser.add_argument ('url', nargs='?', default=False)
+
     test_parser = subparsers.add_parser ('test')
     test_parser.add_argument ('-d', '--db', action='store_true', default=False)
 
@@ -34,7 +38,7 @@ def createParser ():
     planet_parser.add_argument ('name', nargs='?', default=False)
     planet_parser.add_argument ('-l', '--list', action='store_true', default=False)
     planet_parser.add_argument ('-u', '--use', action='store_true', default=False)
-    planet_parser.add_argument ('-i', '--info', action='store_true', default=False)
+    #planet_parser.add_argument ('-i', '--info', action='store_true', default=False)
     planet_parser.add_argument ('-n', '--near', action='store_true', default=False)
     planet_parser.add_argument ('-c', '--create', nargs='+', default=False)
     planet_parser.add_argument ('--all', action='store_true', default=False)
@@ -56,11 +60,8 @@ def createParser ():
     register_parser.add_argument ('-p', '--password', required=True)
     register_parser.add_argument ('-n', '--name', nargs='+', required=True)
 
-    goodbye_parser = subparsers.add_parser ('goodbye')
-    goodbye_parser.add_argument ('-c', '--count', type=int, default=1)
-
-    curl_parser = subparsers.add_parser ('net')
-    curl_parser.add_argument ('-u', '--url', action='store_true', default=False)
+    #curl_parser = subparsers.add_parser ('net')
+    #curl_parser.add_argument ('-u', '--url', action='store_true', default=False)
 
     return parser
 
@@ -69,12 +70,17 @@ def run_version (namespace):
     print ("Version: 0.0.0.0.0.0.1")
 
 
-def run_goodbye (namespace):
-    """
-    Выполнение команды goodbye
-    """
-    for _ in range (namespace.count):
-        print ("Прощай, \033[34;4mмир\033[0m!")
+def run_server (namespace):
+    cfgParser = SafeConfigParser()
+    cfgParser.read("sp.conf")
+    if namespace.url:
+        cfgParser.set('connection', 'url', namespace.url)
+        with open("sp.conf", 'wb') as configfile:
+            cfgParser.write(configfile)
+        print ("Set server:\t" + namespace.url)
+    else :
+        print ("Current server:\t" + cfgParser.get('connection','url'))
+
 
 def write_data( buf ):
     print (buf)
@@ -122,6 +128,8 @@ if __name__ == '__main__':
 
     if namespace.command == "version":
         run_version (namespace)
+    elif namespace.command == "server":
+        run_server (namespace)
     elif namespace.command == "user":
         if namespace.password and namespace.name:
             run_curl (namespace, write_data_login)
