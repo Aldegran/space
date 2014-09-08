@@ -165,6 +165,7 @@ class planetClass extends BaseClass
 				echo("\n".$item['name']);
 				echo("\t".$item['x']." : ".$item['y']);
 				if(isset($item['d']))echo (' ('.$item['d'].')');
+				else echo("\t");
 				if(!$me && $verbose > 1) echo("\t".$item['user_id']);
 				else if($me) echo("\tME");
 				else echo ("\t- ");
